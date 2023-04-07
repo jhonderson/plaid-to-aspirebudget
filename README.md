@@ -20,7 +20,7 @@ Please leave a star if this was helpful.
 3. Set up the Plaid Quickstart app on your machine by following these instructions: https://plaid.com/docs/quickstart/.
 4. If you are planning to use Development environment (i.e real data), follow these additional steps:
    1. Go to https://dashboard.plaid.com/team/api and in the section "Allowed redirect URIs add the url: https://localhost:3000/
-   2. Copy the example environment file in this project ([.env.example](.env.example)) to your quickstart node folder: `quickstart/node/.env`. Change the following variables with your credentials: `PLAID_CLIENT_ID` and `PLAID_SECRET`. If you want to retrieve credit cards I recommend you setting this variable: `PLAID_PRODUCTS=transactions,liabilities`
+   2. Copy the example environment file in this project ([.env.example](.env.example)) to your quickstart node folder: `quickstart/node/.env`. Change the following variables with your credentials: `PLAID_CLIENT_ID` and `PLAID_SECRET`.
    3. Create a certificate for localhost following these steps: https://github.com/plaid/quickstart/blob/master/README.md#testing-oauth.
 5. Start the Quickstart application (backend and frontend) and then use Plaid Link to connect to your bank accounts. Once you're connected, the Quickstart app will show your access_token. Copy the access token for each account, as you will need it later to set up the script in your Google Spreadsheet
 
