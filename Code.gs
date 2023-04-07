@@ -91,7 +91,7 @@ function downloadTransactionsFromPlaidForAccountId(accountId) {
     const transactionsSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(TRANSACTIONS_SHEET_NAME);
     const incomingTransactions = parsePlaidTransactions(plaidTransactionsPayload);
     const existingTransactions = getTransactionsFromSheet(transactionsSheet, startDate, accountId);
-    const {transactionsToUpdate, transactionsToInsert } = reconciliateTransactions(existingTransactions, incomingTransactions);
+    const {transactionsToUpdate, transactionsToInsert} = reconciliateTransactions(existingTransactions, incomingTransactions);
     for (transactionToUpdate of transactionsToUpdate) {
       const rowNumber = transactionToUpdate.rowNumber;
       const transactionRow = convertTransactionToRow(transactionToUpdate);
@@ -116,7 +116,7 @@ function getTransactionsFromPlaid(startDate, endDate, accountId) {
     }
   };
 
-  var options = {
+  const options = {
     "method" : "POST",
     "contentType" : "application/json",
     "payload" : JSON.stringify(requestInput)
@@ -154,7 +154,7 @@ function getTransactionsFromSheet(transactionsSheet, startDate, accountId) {
         && daysBetweenDates(startDate, transaction.date) <= TRANSACTION_MATCHING_MAX_DAYS_OF_DIFFERENCE);
 }
 
-function reconciliateTransactions(existingTransactions, upcomingTransactions) {
+function reconciliateTransactions(existingTransactions, incomingTransactions) {
   const indexedExistingTransactions = existingTransactions.reduce(function(map, transaction) {
     const transactionKey = buildTransactionKey(transaction);
     map[transactionKey] = map[transactionKey] || [];
@@ -163,7 +163,7 @@ function reconciliateTransactions(existingTransactions, upcomingTransactions) {
   }, {});
   const transactionsToUpdate = [];
   const transactionsToInsert = [];
-  for (upcomingTransaction of upcomingTransactions) {
+  for (upcomingTransaction of incomingTransactions) {
     const upcomingTransactionKey = buildTransactionKey(upcomingTransaction);
     if (upcomingTransactionKey in indexedExistingTransactions) {
       const existingTransactions = indexedExistingTransactions[upcomingTransactionKey];
