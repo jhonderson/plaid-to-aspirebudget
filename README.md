@@ -9,6 +9,8 @@ Google AppScript script to retrieve transactions from Plaid API and store them i
 3. How transactions are matched (i.e when a transaction is treated as duplicated)? 2 transactions are matched when they come from the same account, they have the same amount value, and the difference of days between both dates is less or equals than 10 (you can change the 10 days value).
 4. You can configure this script in your Google spreadsheet and execute it manually or schedule it.
 
+Please leave a star if this was helpful.
+
 ## Setup
 
 ### Get Plaid Access Token
