@@ -167,10 +167,12 @@ function reconciliateTransactions(existingTransactions, upcomingTransactions) {
     const upcomingTransactionKey = buildTransactionKey(upcomingTransaction);
     if (upcomingTransactionKey in indexedExistingTransactions) {
       const existingTransactions = indexedExistingTransactions[upcomingTransactionKey];
-      var transactionMatched = false;
-      for (existingTransaction of existingTransactions) {
+      let transactionMatched = false;
+      let indexOfMatchedExistingTransaction = -1;
+      for (let [index, existingTransaction] of existingTransactions.entries()) {
         if (daysBetweenDates(existingTransaction.date, upcomingTransaction.date) <= TRANSACTION_MATCHING_MAX_DAYS_OF_DIFFERENCE) {
           transactionMatched = true;
+          indexOfMatchedExistingTransaction = index;
           if (!!existingTransaction.pending && !upcomingTransaction.pending) {
           	// Updating transactions only when the transactions moved from pending to cleared
           	// Updating only the pending field, the rest of the fields will be kept
@@ -183,6 +185,10 @@ function reconciliateTransactions(existingTransactions, upcomingTransactions) {
         }
       }
       if (transactionMatched) {
+        if (indexOfMatchedExistingTransaction >= 0) {
+          // to avoid matching multiple incoming transactions to the same existing transaction
+          indexedExistingTransactions[upcomingTransactionKey].splice(indexOfMatchedExistingTransaction, 1);
+        }
         // to avoid duplicated transactions
         continue;
       }
