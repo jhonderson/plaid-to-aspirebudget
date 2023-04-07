@@ -31,8 +31,8 @@ curl -X POST https://development.plaid.com/accounts/get \
 -H 'Content-Type: application/json' \
 -d '{
   "client_id": "<your Plaid client id>",
-  "secret": "<your Plaid secret>",
-  "access_token": "<your Plaid access token>"
+  "secret": "<your Plaid secret for development environment>",
+  "access_token": "<your Plaid access token for the bank you want to retrieve accounts from>"
 }'
 ```
 
@@ -58,8 +58,8 @@ Sample response
 ### Set up the code in App Script
 
 1. Go to your Aspire Budget Google spreadsheet.
-2. Go to Extensions -> Apps Script. Name your project, we will assume it is called **Aspire** in this tutorial.
-3. In the Apps Script editor. Copy the content of the script [Code.gs](Code.gs) in this repo and pasted in the App Script editor, in the `Code.gs` file.
+2. Go to Extensions -> Apps Script. Name your project, this guide will assume you called it **Aspire**.
+3. Copy the content of the script [Code.gs](Code.gs) from this repo and pasted in the App Script editor, in the `Code.gs` file.
 
 Configure Plaid credentials:
 ```javascript
@@ -117,7 +117,7 @@ const USING_ISO_FORMAT = false;
 
 Configure additional script parameters:
 ```javascript
-const MAX_TRANSACTIONS_TO_IMPORT = 500; // Can't be larger than 500
+const MAX_TRANSACTIONS_TO_IMPORT = 500; // Can't be greater than 500
 const PLAID_TRANSACTIONS_DAYS_TO_IMPORT = 14; // Importing transactions from the last 2 weeks
 const TRANSACTION_MATCHING_MAX_DAYS_OF_DIFFERENCE = 10; // 2 transactions will be matched if they have the same account, same amount and the difference of days between both dates are less or equals than 10
 ```
@@ -129,8 +129,8 @@ const PLAID_SECRET = PLAID_DEVELOPMENT_SECRET; // PLAID_SANDBOX_SECRET for Sandb
 ```
 
 There are 2 ways to execute the transactions retrieval process, manual ad-hoc execution or scheduling:
-1. Go to your Google spreadsheet and click Extensions > Aspire > Download Transactions From Plaid
-2. In your AppScript project, go to Triggers and add a new trigger. For daily executions at midnight use these options:
+1. Manual: Go to your Google spreadsheet and click Extensions > Aspire > Download Transactions From Plaid
+2. Scheduling: In your AppScript project, go to Triggers and add a new trigger. For daily executions at midnight use these options:
    - Choose which function to run: `onDailyScheduledExecution`
    - Which runs at deployment: `Head`
    - Select event source: `Time-driven`
