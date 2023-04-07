@@ -18,9 +18,9 @@ Google AppScript script to retrieve transactions from Plaid API and store them i
 3. Set up the Plaid Quickstart app on your machine by following these instructions: https://plaid.com/docs/quickstart/.
 4. If you are planning to use Development environment (i.e real data), follow these additional steps:
    1. Go to https://dashboard.plaid.com/team/api and in the section "Allowed redirect URIs add the url: https://localhost:3000/
-   2. Copy the example environment file in this project to your quickstart node folder `quickstart/node/.env`. Change the following variables with your credentials: `PLAID_CLIENT_ID` and `PLAID_SECRET`. If you want to retrieve credit cards I recommend you setting this variable: `PLAID_PRODUCTS=transactions,liabilities`
+   2. Copy the example environment file in this project ([.env.example](.env.example)) to your quickstart node folder: `quickstart/node/.env`. Change the following variables with your credentials: `PLAID_CLIENT_ID` and `PLAID_SECRET`. If you want to retrieve credit cards I recommend you setting this variable: `PLAID_PRODUCTS=transactions,liabilities`
    3. Create a certificate for localhost following these steps: https://github.com/plaid/quickstart/blob/master/README.md#testing-oauth.
-5. Start the Quickstart application and then use Plaid Link to connect to one of your bank accounts. Once you're connected, the Quickstart app will show your access_token. Copy it somewhere as you will need it later to set up the script
+5. Start the Quickstart application (backend and frontend) and then use Plaid Link to connect to one of your bank accounts. Once you're connected, the Quickstart app will show your access_token. Copy it somewhere as you will need it later to set up the script in your Google Spreadsheet
 
 You need to know the Plaid account ids for each of the accounts you want to retrieve transactions from. Use this command to retrieve the list of accounts, and take a note of the account ids you want to use:
 ```bash
@@ -28,11 +28,14 @@ You need to know the Plaid account ids for each of the accounts you want to retr
 curl -X POST https://development.plaid.com/accounts/get \
 -H 'Content-Type: application/json' \
 -d '{
-  "client_id": "XXXxxx",
-  "secret": "XXXxxx",
-  "access_token": "access-development-XXXxxx"
+  "client_id": "<your Plaid client id>",
+  "secret": "<your Plaid secret>",
+  "access_token": "<your Plaid access token>"
 }'
+```
 
+Sample response
+```bash
 {
   "accounts": [
     {
@@ -71,6 +74,8 @@ const ACCOUNT_ID_TO_ACCESS_TOKEN_MAPPING = {
   'accountId2_XXXxxx': 'access-development-_YYYyyy'
 };
 ```
+
+The account ids are the ones you retrieved from Plaid using the `curl` command.
 
 Configure the mapping between account ids and the account names you use in your Google spreadsheet:
 ```javascript
