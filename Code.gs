@@ -76,10 +76,19 @@ function onDailyScheduledExecution() {
 }
 
 function downloadTransactionsFromPlaid() {
+  let errorsDownloadingTransactions = [];
   Object.keys(ACCOUNT_ID_TO_ACCOUNT_NAME_MAPPING).forEach(accountId => {
-      downloadTransactionsFromPlaidForAccountId(accountId);
+      try {
+        downloadTransactionsFromPlaidForAccountId(accountId);
+      } catch (e) {
+        errorsDownloadingTransactions.push(e);
+        console.error(`Error downloading transactions from account "${ACCOUNT_ID_TO_ACCOUNT_NAME_MAPPING[accountId]}": ${e}`);
+      }
       SpreadsheetApp.flush();
-    })
+    });
+  if (errorsDownloadingTransactions.length > 0) {
+    throw new Error(`Error downloading transactions: ${errorsDownloadingTransactions}`);
+  }
 }
 
 function downloadTransactionsFromPlaidForAccountId(accountId) {
