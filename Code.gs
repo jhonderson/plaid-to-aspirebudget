@@ -89,9 +89,9 @@ function downloadTransactionsFromPlaidForAccountId(accountId) {
 
   if (plaidTransactionsPayload.transactions.length > 0) {
     const transactionsSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(TRANSACTIONS_SHEET_NAME);
-    const upcomingTransactions = parsePlaidTransactions(plaidTransactionsPayload);
+    const incomingTransactions = parsePlaidTransactions(plaidTransactionsPayload);
     const existingTransactions = getTransactionsFromSheet(transactionsSheet, startDate, accountId);
-    const {transactionsToUpdate, transactionsToInsert } = reconciliateTransactions(existingTransactions, upcomingTransactions);
+    const {transactionsToUpdate, transactionsToInsert } = reconciliateTransactions(existingTransactions, incomingTransactions);
     for (transactionToUpdate of transactionsToUpdate) {
       const rowNumber = transactionToUpdate.rowNumber;
       const transactionRow = convertTransactionToRow(transactionToUpdate);
@@ -174,8 +174,8 @@ function reconciliateTransactions(existingTransactions, upcomingTransactions) {
           transactionMatched = true;
           indexOfMatchedExistingTransaction = index;
           if (!!existingTransaction.pending && !upcomingTransaction.pending) {
-          	// Updating transactions only when the transactions moved from pending to cleared
-          	// Updating only the pending field, the rest of the fields will be kept
+            // Updating transactions only when the transactions moved from pending to cleared
+            // Updating only the pending field, the rest of the fields will be kept
             transactionsToUpdate.push({
               ...existingTransaction,
               pending: false
