@@ -101,10 +101,9 @@ function downloadTransactionsFromPlaidForAccountId(accountId) {
   const startDate = getStartDate();
   const endDate = getEndDate();
   const plaidTransactionsPayload = getTransactionsFromPlaid(startDate, endDate, accountId);
-
   if (plaidTransactionsPayload.transactions.length > 0) {
     const transactionsSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(TRANSACTIONS_SHEET_NAME);
-    const incomingTransactions = parsePlaidTransactions(plaidTransactionsPayload);
+    const incomingTransactions = filterPlaidDuplicatedTransactions(parsePlaidTransactions(plaidTransactionsPayload));
     const existingTransactions = getTransactionsFromSheet(transactionsSheet, startDate, accountId);
     const {transactionsToUpdate, transactionsToInsert} = reconciliateTransactions(existingTransactions, incomingTransactions);
     for (transactionToUpdate of transactionsToUpdate) {
@@ -148,8 +147,42 @@ function parsePlaidTransactions(plaidTransactionsPayload) {
       category: mapTransactionCategory(transaction.category, transaction.merchant_name),
       account: ACCOUNT_ID_TO_ACCOUNT_NAME_MAPPING[transaction.account_id],
       name: transaction.name,
-      pending: transaction.pending
+      pending: transaction.pending,
+      // Needed for deduping plaid transactions
+      authorized_date: transaction.authorized_date,
+      category_id: transaction.category_id,
+      merchant_name: transaction.merchant_name,
     }));
+}
+
+function filterPlaidDuplicatedTransactions(plaidTransactions) {
+  const indexedTransactions = plaidTransactions.reduce(function(map, transaction) {
+      const plaidTransactionKey = `${transaction.amount}_${transaction.authorized_date}_${transaction.account}_${transaction.category_id}_${transaction.merchant_name}`;
+      map[plaidTransactionKey] = map[plaidTransactionKey] || [];
+      map[plaidTransactionKey].push(transaction);
+      return map;
+    }, {});
+  let finalTransactions = [];
+  for (let [key, duplicatedTransactions] of Object.entries(indexedTransactions)) {
+    if (duplicatedTransactions.length == 1) {
+      finalTransactions.push(duplicatedTransactions[0]);
+      continue;
+    }
+    const clearedTransactions = duplicatedTransactions.filter(transaction => transaction.pending === false);
+    const pendingTransactions = duplicatedTransactions.filter(transaction => transaction.pending === true);
+    if (clearedTransactions.length === pendingTransactions.length) {
+      finalTransactions = [
+        ...finalTransactions,
+        ...clearedTransactions
+      ];
+    } else {
+      finalTransactions = [
+        ...finalTransactions,
+        ...duplicatedTransactions
+      ];
+    }
+  }
+  return finalTransactions;
 }
 
 function getTransactionsFromSheet(transactionsSheet, startDate, accountId) {
