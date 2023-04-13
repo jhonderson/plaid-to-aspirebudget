@@ -33,6 +33,12 @@ const CATEGORY_MAPPING = {
   '__defaultCategory': '🛍 Shopping'
 };
 
+// Mapping between merchant name returned by Plaid and your category names
+const MERCHANT_NAME_TO_CATEGORY_MAPPING = {
+  'Freedom': '📱Phone',
+  'Shaw Cablesystems': '💻 Internet',
+};
+
 // Depending on your Aspire sheet date format:
 //   true: 2023-02-27
 //   false: 2/27/2023
@@ -139,7 +145,7 @@ function parsePlaidTransactions(plaidTransactionsPayload) {
   return plaidTransactionsPayload.transactions.map(transaction => ({
       date: new Date(transaction.date),
       amount: transaction.amount,
-      category: mapTransactionCategory(transaction.category),
+      category: mapTransactionCategory(transaction.category, transaction.merchant_name),
       account: ACCOUNT_ID_TO_ACCOUNT_NAME_MAPPING[transaction.account_id],
       name: transaction.name,
       pending: transaction.pending
@@ -236,7 +242,10 @@ function formatDateToISOString(date) {
   return date.toISOString().split('T')[0];
 }
 
-function mapTransactionCategory(categories) {
+function mapTransactionCategory(categories, merchantName) {
+  if (merchantName in MERCHANT_NAME_TO_CATEGORY_MAPPING) {
+    return MERCHANT_NAME_TO_CATEGORY_MAPPING[merchantName];
+  }
   for (category of categories.reverse()) {
     if (category in CATEGORY_MAPPING) {
       return CATEGORY_MAPPING[category];

@@ -108,6 +108,17 @@ const CATEGORY_MAPPING = {
 };
 ```
 
+Configure the mapping between the merchant name provided by Plaid and the categories you use in your Google spreadsheet:
+```javascript
+// Mapping between merchant name returned by Plaid and your category names
+const MERCHANT_NAME_TO_CATEGORY_MAPPING = {
+  'Freedom': '📱Phone',
+  'Shaw Cablesystems': '💻 Internet',
+};
+```
+
+Notice that the to find the category of a transaction, the `MERCHANT_NAME_TO_CATEGORY_MAPPING` mapping has priority over the `CATEGORY_MAPPING` mapping. Therefore, if the merchant name is found in `MERCHANT_NAME_TO_CATEGORY_MAPPING`, its associated category will be used, otherwise the category returned by plaid will be looked at `MERCHANT_NAME_TO_CATEGORY_MAPPING`.
+
 Configure the following variable depending onthe date format you use in Google spreadsheet:
 ```javascript
 //   true: 2023-02-27
